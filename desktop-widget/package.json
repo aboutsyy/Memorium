@@ -1,0 +1,12 @@
+{
+  "name": "memorium-desktop",
+  "version": "1.0.0",
+  "description": "Memorium aquarium desktop widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
+}
