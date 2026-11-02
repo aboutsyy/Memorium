@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Memorium</title>
+<style>
+:root{--bg:#eef3f1;--panel:#ffffff;--ink:#16302f;--mute:#5b7472;--line:#cfdcd9;--acc:#0f8b8d;--accink:#ffffff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b1c;--panel:#14292a;--ink:#e3f1ef;--mute:#8fb0ad;--line:#244042;--acc:#3cc4c0;--accink:#06201f}}
+:root[data-theme="dark"]{--bg:#0d1b1c;--panel:#14292a;--ink:#e3f1ef;--mute:#8fb0ad;--line:#244042;--acc:#3cc4c0;--accink:#06201f}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+main{max-width:720px;margin:0 auto;padding:12px}
+h1{font-size:1.4rem;margin:4px 0 10px;font-weight:800}
+#tank{display:block;margin:0;border-radius:3px;touch-action:manipulation;background:#0b5d6b}
+.frame{width:fit-content;max-width:100%;margin:6px auto 14px}
+.rim{padding:12px;border-radius:8px 8px 4px 4px;background:linear-gradient(145deg,#33383d,#0d0f11 55%,#272b30);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.6),0 6px 14px rgba(0,0,0,.35)}
+.glass{position:relative;display:block;line-height:0;outline:2px solid rgba(0,0,0,.7)}
+.glass::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 16%,transparent 30%,transparent 72%,rgba(255,255,255,.06) 86%,rgba(255,255,255,.16) 100%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.14),inset 0 0 22px rgba(0,0,0,.4)}
+.stand{height:20px;margin:0 -10px;border-radius:2px 2px 8px 8px;background:linear-gradient(#6b5239,#3b2c1e);box-shadow:inset 0 2px 0 rgba(255,255,255,.15),0 16px 18px -8px rgba(0,0,0,.4)}
+.hint{font-size:.85rem;color:var(--mute);margin:6px 2px 12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.sp{display:flex;gap:6px;flex:1 1 100%}
+.sp button{flex:1;padding:10px 4px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;font:inherit;font-weight:700}
+.sp button[aria-pressed="true"]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+label{font-size:.9rem}
+input[type=file]{flex:1 1 100%;font:inherit;font-size:.85rem}
+input[type=range]{flex:1;min-width:120px}
+.go{width:100%;padding:12px;border:0;border-radius:10px;background:var(--acc);color:var(--accink);font:inherit;font-weight:800;font-size:1rem}
+.go:disabled{opacity:.5}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;gap:10px;font-size:.9rem}
+.item img{width:40px;height:32px;object-fit:contain;background:rgba(127,127,127,.15);border-radius:6px}
+.item span{flex:1}
+.item button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit}
+.feedrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 12px}
+.feedrow .hint{margin:0;flex:1 1 100%}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.tankset label{display:block;font-size:.9rem;margin-bottom:8px}
+.tankset input[type=text]{display:block;width:100%;margin-top:3px;padding:8px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;font:inherit}
+.tankset input[type=range]{display:block;width:100%;margin-top:4px}
+.tankset .del{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit}
+.tankset .del:disabled{opacity:.4}
+.brand{font-size:2.1rem;margin:10px 0 2px;letter-spacing:.02em;font-weight:800}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.tcard{display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;padding:0;overflow:hidden;font:inherit;cursor:pointer}
+.tcard .thumb{height:84px;background:linear-gradient(#1aa0b0,#073f52);display:flex;align-items:flex-end;gap:4px;padding:6px}
+.tcard .thumb img{height:38px;max-width:52px;object-fit:contain}
+.tcard .meta{padding:8px 10px;font-size:.82rem;color:var(--mute)}
+.tcard .meta strong{display:block;font-size:1rem;color:var(--ink)}
+.empty{grid-column:1/-1;color:var(--mute);padding:20px 4px;margin:0}
+.tgrid{grid-template-columns:1fr;gap:10px}
+.hcard{cursor:pointer;border-radius:12px}
+.hcard canvas{display:block;border-radius:3px;background:#0b5d6b}
+.hcard .meta{text-align:center;color:var(--mute);font-size:.85rem;margin-top:-2px}
+.hcard .meta strong{display:block;font-size:1.05rem;color:var(--ink)}
+.homehead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.frames{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fsw{display:flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:6px 10px;font:inherit;font-size:.85rem}
+.fsw i{width:16px;height:16px;border-radius:4px;display:inline-block;border:1px solid rgba(127,127,127,.5)}
+.fsw[aria-pressed="true"]{border-color:var(--acc);font-weight:800}
+.frame[data-f="kayu"] .rim{background:linear-gradient(145deg,#b07a42,#6b4423 55%,#94622f);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.45),0 6px 14px rgba(0,0,0,.35)}
+.frame[data-f="kayu"] .stand{background:linear-gradient(#8a6038,#4a2f19)}
+.frame[data-f="putih"] .rim{background:linear-gradient(145deg,#fafaf8,#c7cacc 55%,#e8eaeb);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.3)}
+.frame[data-f="putih"] .stand{background:linear-gradient(#ece7dd,#b8b1a3)}
+.frame[data-f="emas"] .rim{background:linear-gradient(145deg,#f6d983,#a7762a 55%,#dcb65a);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.4),0 6px 14px rgba(0,0,0,.35)}
+.frame[data-f="emas"] .stand{background:linear-gradient(#3a2d20,#17110b)}
+.frame[data-f="kaca"] .rim{background:linear-gradient(145deg,rgba(255,255,255,.35),rgba(150,210,225,.18) 55%,rgba(255,255,255,.3));box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),0 6px 14px rgba(0,0,0,.25)}
+.frame[data-f="kaca"] .stand{background:linear-gradient(#cfd5d8,#9aa3a8)}
+.tankset label.chk{display:flex;align-items:center;gap:8px}
+.chk input{width:20px;height:20px;margin:0;accent-color:var(--acc)}
+.tgrid.small{grid-template-columns:repeat(3,1fr);gap:8px;align-items:start}
+.tgrid.small .hcard{min-width:0}
+.small .frame{margin:2px auto 6px}
+.small .rim{padding:5px;border-radius:5px 5px 2px 2px}
+.small .glass{outline-width:1px}
+.small .stand{height:8px;margin:0 -4px}
+.small .hcard .meta{font-size:.65rem}
+.small .hcard .meta strong{font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small .hcard .meta{height:3.4em;overflow:hidden}
+.tgrid.small{align-items:end}
+.hcard{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.hcard.lift{position:relative;z-index:5;opacity:.92;filter:drop-shadow(0 12px 16px rgba(0,0,0,.4));cursor:grabbing}
+.hcard.target{outline:3px dashed var(--acc);outline-offset:4px}
+.loadmsg{display:none}
+#home.loading>*:not(.loadmsg){display:none}
+#home.loading .loadmsg{display:flex;align-items:center;justify-content:center;min-height:70vh;color:var(--mute);font-size:1rem}
+.feedbtn{padding:10px 14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;font:inherit;font-weight:800;white-space:nowrap}
+.feedbtn[aria-pressed="true"]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:50vh;overflow-y:auto;background:var(--panel);color:var(--ink);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));z-index:20;box-shadow:0 -8px 24px rgba(0,0,0,.25);animation:up .25s ease-out}
+.sheet[hidden]{display:none}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.shead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.shead strong{font-size:1.2rem}
+.shead button,.gal button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit}
+.fact{font-size:.85rem;color:var(--mute);margin:4px 0 10px}
+.sheet label{display:block;font-size:.8rem;color:var(--mute);margin-bottom:8px}
+.sheet input[type=text],.sheet input[type=date],.sheet textarea{display:block;width:100%;margin-top:3px;padding:8px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;font:inherit}
+.sheet h2{font-size:1rem;margin:12px 0 6px}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.8rem;margin-top:10px}
+.gal figure{margin:0}
+.gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.gal figcaption{font-size:.75rem;color:var(--mute);margin:2px 0}
+.lb{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.94);color:#fff;display:flex;flex-direction:column;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.lb[hidden]{display:none}
+.lbbar{display:flex;justify-content:flex-end}
+.lb button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:10px 20px;font:inherit;font-size:1.1rem}
+.lbstage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;touch-action:pan-y}
+.lbstage img{flex:0 1 auto;min-height:0;max-width:100%;object-fit:contain;border-radius:8px;user-select:none;-webkit-user-select:none}
+.lbstage p{margin:0;font-size:.9rem;text-align:center}
+.lbnav{display:flex;justify-content:space-between;gap:10px}
+.lbstage video{flex:0 1 auto;min-height:0;max-width:100%;max-height:100%;border-radius:8px;background:#000}
+.mw{position:relative}
+.cmrow input{width:90px;padding:6px 8px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;font:inherit}
+.gal video{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.mw.vid::after{content:'\25B6';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;pointer-events:none}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<section id="home" class="loading">
+  <div class="loadmsg" role="status">Memuat penyimpanan...</div>
+  <div class="homehead"><h1 class="brand">Memorium</h1><button type="button" class="feedbtn" id="setbtn" aria-expanded="false">Pengaturan</button></div>
+  <p class="hint">Tempat menyimpan kenangan peliharaan akuariummu. Ketuk akuarium untuk membukanya, tahan untuk menukar posisinya.</p>
+  <p class="hint" id="sstat" aria-live="polite" style="margin-top:-6px"></p>
+  <section class="panel tankset" id="spanel" hidden>
+    <label class="chk"><input type="checkbox" id="smove" checked> Peliharaan bergerak di beranda</label>
+    <div role="radiogroup" aria-label="Tampilan akuarium di beranda">
+      <p style="margin:6px 0 6px;font-size:.9rem">Tampilan akuarium di beranda</p>
+      <label class="chk"><input type="radio" name="hsize" id="sbig" checked> Besar, 1 per baris</label>
+      <label class="chk"><input type="radio" name="hsize" id="ssmall"> Kecil, 3 per baris</label>
+    </div>
+  </section>
+  <div id="tgrid" class="tgrid"></div>
+  <button type="button" class="go" id="newbtn">+ Buat tank</button>
+  <section class="panel tankset" id="cpanel" hidden style="margin-top:12px">
+    <label>Nama tank<input type="text" id="cname" maxlength="20" placeholder="Contoh: Tank Ruang Tamu"></label>
+    <label>Lebar: <span id="clv">60</span> cm<input type="range" id="cl" min="0" max="150" value="60"></label>
+    <label>Tinggi: <span id="ctv">40</span> cm<input type="range" id="ct" min="0" max="80" value="40"></label>
+    <div class="row"><button type="button" class="go" id="cok" style="flex:1">Buat dan buka</button><button type="button" class="del" id="ccancel">Batal</button></div>
+  </section>
+</section>
+<div id="tankview" hidden>
+<div class="tabs" id="tabs"></div>
+<div class="frame"><div class="rim"><div class="glass"><canvas id="tank" aria-label="Akuarium"></canvas></div></div><div class="stand"></div></div>
+<div class="feedrow"><button type="button" id="feed" class="feedbtn" aria-pressed="false">Beri makan: mati</button><button type="button" id="info" class="feedbtn" aria-pressed="false">Info: mati</button><span class="hint" id="fhint">Mengetuk peliharaan bikin dia kabur.</span></div>
+
+<section class="panel tankset" id="tedit" hidden>
+  <label>Nama tank<input type="text" id="tname" maxlength="20"></label>
+  <label>Lebar: <span id="lv">60</span> cm<input type="range" id="tl" min="0" max="150" value="60"></label>
+  <label>Tinggi: <span id="tv">40</span> cm<input type="range" id="tt" min="0" max="80" value="40"></label>
+  <div role="group" aria-label="Frame akuarium"><p style="margin:2px 0 6px;font-size:.9rem">Frame akuarium</p><div class="frames" id="fpick"></div></div>
+  <button type="button" class="del" id="tdel">Hapus tank</button>
+</section>
+
+<section class="panel">
+  <div class="row">
+    <div class="sp" role="group" aria-label="Jenis peliharaan">
+      <button type="button" data-s="udang" aria-pressed="false">Udang</button>
+      <button type="button" data-s="molly" aria-pressed="true">Molly</button>
+      <button type="button" data-s="cupang" aria-pressed="false">Cupang</button>
+    </div>
+    <input type="file" id="file" accept="image/png,image/*" aria-label="Pilih foto PNG">
+    <label>Ukuran <input type="range" id="size" min="8" max="220" value="100"></label>
+    <label class="cmrow">Atau ketik panjang (cm) <input type="number" id="cm" min="0.1" step="0.1" inputmode="decimal" placeholder="mis. 5"></label>
+    <span class="hint" id="cmhint" style="flex:1 1 100%;margin:0"></span>
+    <label><input type="checkbox" id="left"> Foto menghadap kiri</label>
+  </div>
+  <button class="go" id="add" disabled>Masukkan ke akuarium</button>
+  <p class="hint" style="margin-bottom:0">Pakai PNG dengan latar transparan supaya hasilnya rapi. Tanpa foto, kamu bisa pakai peliharaan bawaan.</p>
+</section>
+
+<section class="panel">
+  <div class="list" id="list"></div>
+</section>
+</div>
+</main>
+<aside id="sheet" class="sheet" hidden role="dialog" aria-label="Info peliharaan">
+<div class="shead"><strong id="sname"></strong><button type="button" id="sclose">Tutup</button></div>
+<p class="fact" id="sfact"></p>
+<label>Nama<input type="text" id="fnama" maxlength="24"></label>
+<label>Tanggal masuk akuarium<input type="date" id="ftgl"></label>
+<label>Makanan favorit<input type="text" id="ffood"></label>
+<label>Sifat<input type="text" id="fsifat"></label>
+<label>Catatan<textarea id="fnote" rows="2"></textarea></label>
+<h2>Galeri memory</h2>
+<label>Keterangan untuk foto atau video berikutnya<input type="text" id="mcap"></label>
+<input type="file" id="mfile" accept="image/*,video/*" multiple aria-label="Tambah foto atau video memory">
+<div class="gal" id="gal"></div>
+</aside>
+<div class="lb" id="lb" hidden role="dialog" aria-label="Foto memory">
+<div class="lbbar"><button type="button" id="lbx">Tutup</button></div>
+<div class="lbstage" id="lbstage"><img id="lbimg" alt="" draggable="false"><video id="lbvid" controls playsinline hidden></video><p id="lbcap"></p></div>
+<div class="lbnav"><button type="button" id="lbp" aria-label="Foto sebelumnya">‹</button><button type="button" id="lbn" aria-label="Foto berikutnya">›</button></div>
+</div>
+
+<script>
+(function(){
+var cv=document.getElementById('tank'),ctx=cv.getContext('2d'),mainCv=cv,mainCtx=ctx;
+var W=0,H=0,floor=0,species='molly',pending=null,pets=[],food=[],bubbles=[],plants=[],camK=0,camT=0,camPet=null,sheetPet=null,tanks=[],cur=null,sc=1,inTank=false,homeMove=true,homeSmall=false,pvUntil=0;
+
+function resize(){
+  if(!cur||!inTank)return;
+  bind(cur,mainCv,mainCtx,pipWin?pipWin.innerWidth-24:document.getElementById('tankview').clientWidth-48);updateCmHint();
+}
+function resizeOld(){
+  var d=Math.min(window.devicePixelRatio||1,2);
+  var cw=Math.max(200,document.getElementById('tankview').clientWidth-48),ar=Math.max(.35,cur.t/cur.l),mh=Math.max(220,window.innerHeight*.58),w0=cw,h0=cw*ar;
+  if(h0>mh){h0=mh;w0=mh/ar;}
+  if(h0<180)h0=180;
+  cv.style.width=w0+'px';cv.style.height=h0+'px';
+  W=Math.round(w0);H=Math.round(h0);
+  sc=Math.max(.35,Math.min(1.8,W/(cur.l*6)));
+  cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);
+  floor=H-Math.max(40,H*.1);
+  plants=[];
+  for(var i=0;i<7;i++)plants.push({x:(i+.5)*W/7+((i*53)%30-15),h:H*(.16+((i*37)%20)/100),p:i*1.7});
+  food.length=0;
+  pets.forEach(function(p){p.w=p.wb*sc;p.h=p.hb*sc;});
+}
+function newTank(n,l,t){return {id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:n,l:l==null?60:l,t:t==null?40:t,frame:'hitam',pets:[],food:[],bubbles:[]};}
+function bind(k,c,x,cwid,mini){
+  var d=Math.min(window.devicePixelRatio||1,2),ar=Math.max(.35,Math.max(1,k.t)/Math.max(1,k.l)),mh=mini?Math.max(90,window.innerHeight*.2):(pipWin?pipWin.innerHeight-24:Math.max(220,window.innerHeight*.58)),w0=Math.max(60,cwid),h0=w0*ar;
+  if(h0>mh){h0=mh;w0=mh/ar;}
+  if(h0<(mini?60:180)&&!pipWin)h0=mini?60:180;
+  if(mini){w0=Math.max(40,cwid);h0=w0*Math.max(1,k.t)/Math.max(1,k.l);}
+  var nW=Math.round(w0),nH=Math.round(h0);
+  if(k.W&&(k.W!==nW||k.H!==nH)){
+    k.pets.forEach(function(p){p.x*=nW/k.W;p.y*=nH/k.H;});
+    k.food.length=0;k.plants=null;
+  }
+  k.W=nW;k.H=nH;
+  if(c.width!==nW*d||c.height!==nH*d){c.width=nW*d;c.height=nH*d;}
+  c.style.width=w0+'px';c.style.height=h0+'px';
+  x.setTransform(d,0,0,d,0,0);
+  cur=k;pets=k.pets;food=k.food;bubbles=k.bubbles;cv=c;ctx=x;W=nW;H=nH;
+  sc=Math.max(mini?.15:.35,Math.min(1.8,W/(Math.max(1,k.l)*6)));
+  floor=H-(mini?H*.1:Math.max(40,H*.1));
+  if(!k.plants){
+    k.plants=[];
+    for(var i=0;i<7;i++)k.plants.push({x:(i+.5)*W/7+((i*53)%30-15),h:H*(.16+((i*37)%20)/100),p:i*1.7});
+  }
+  plants=k.plants;
+  pets.forEach(function(p){p.w=p.cm?p.cm*W/Math.max(1,k.l):p.wb*sc;p.h=p.w*p.hb/p.wb;});
+}
+function homeTick(dt,now){
+  var hw=document.getElementById('home').clientWidth-48,cw3=(document.getElementById('home').clientWidth-16)/3-20,maxL=Math.max.apply(null,tanks.map(function(t){return Math.max(1,t.l);}));
+  tanks.forEach(function(k){
+    if(!k.hc)return;
+    if(homeSmall){bind(k,k.hc,k.hx,hw*Math.max(1,k.l)/maxL,true);k.hc.style.width=(W*cw3/hw)+'px';k.hc.style.height=(H*cw3/hw)+'px';}else bind(k,k.hc,k.hx,hw);
+    if(homeMove){step(dt);k.food=food;k.bubbles=bubbles;}
+    draw(now);
+  });
+  cur=null;cv=mainCv;ctx=mainCtx;pets=[];food=[];bubbles=[];
+}
+window.addEventListener('resize',resize);
+resize();
+
+function svgImg(s){var i=new Image();i.src='data:image/svg+xml;utf8,'+encodeURIComponent(s);return i;}
+var defaults={
+ molly:svgImg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70"><path d="M8 35 L0 12 Q22 28 30 33 Q30 45 0 58Z" fill="#f3a23b"/><ellipse cx="68" cy="35" rx="42" ry="22" fill="#2b2f3a"/><path d="M60 14 Q72 0 88 14Z" fill="#f3a23b"/><circle cx="96" cy="29" r="4.5" fill="#fff"/><circle cx="97.500" cy="29" r="2.200" fill="#000"/></svg>'),
+ cupang:svgImg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><path d="M52 45 Q0 0 4 45 Q0 90 52 45Z" fill="#d1264a" opacity=".85"/><path d="M70 28 Q90 0 110 26Z" fill="#e6476a"/><path d="M70 62 Q90 90 108 64Z" fill="#e6476a"/><ellipse cx="90" cy="45" rx="42" ry="17" fill="#8e1634"/><circle cx="116" cy="41" r="4" fill="#fff"/><circle cx="117.500" cy="41" r="2" fill="#000"/></svg>'),
+ udang:svgImg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70"><path d="M16 28 Q10 56 36 58 Q70 62 96 46 Q106 36 96 24 Q70 8 40 18 Q22 20 16 28Z" fill="#e8a99a"/><path d="M96 28 Q116 14 120 4M98 34 Q118 30 120 22" stroke="#c4786a" stroke-width="2" fill="none"/><path d="M14 36 L2 28 L4 48Z" fill="#e8a99a"/><path d="M40 60 L36 68M56 62 L54 70M74 58 L74 66" stroke="#c4786a" stroke-width="2"/><circle cx="92" cy="30" r="3.500" fill="#222"/></svg>')
+};
+
+function rnd(a,b){return a+Math.random()*(b-a);}
+
+function addPet(sp,img,w,flipped,name){
+  var r=(img.naturalHeight||70)/(img.naturalWidth||120);
+  var p={sp:sp,img:img,wb:w,hb:w*r,w:w*sc,h:w*r*sc,name:name,flipped:flipped,
+    x:rnd(w,W-w),y:sp==='udang'?floor:rnd(H*.2,floor-60),
+    dir:Math.random()<.5?-1:1,vx:0,vy:0,tx:0,ty:0,t:0,ph:rnd(0,6),pause:0,hop:0,
+    bio:{tgl:new Date().toISOString().slice(0,10),food:'',sifat:'',note:''},mem:[]};
+  p.def=null;for(var dk in defaults)if(defaults[dk]===img)p.def=dk;pickTarget(p);p.fall=1;p.vy=120;p.y=-p.h;pets.push(p);renderList();
+}
+function pickTarget(p){
+  var m=p.w*.6;
+  if(p.sp==='udang'){p.tx=rnd(m,W-m);p.ty=floor-p.h*.35;p.t=rnd(1.5,4);}
+  else if(p.sp==='cupang'){p.tx=rnd(m,W-m);p.ty=rnd(H*.2,floor-H*.25);p.t=rnd(3,6);}
+  else{p.tx=rnd(m,W-m);p.ty=rnd(H*.12,floor-p.h);p.t=rnd(2,5);}
+}
+function speed(p){return p.sp==='udang'?22:p.sp==='cupang'?30:60;}
+
+function step(dt){
+  camK+=(camT-camK)*Math.min(1,dt*5);
+  pets.forEach(function(p){
+    p.ph+=dt*(p.sp==='cupang'?3:p.sp==='udang'?6:8);
+    p.t-=dt;
+    if(p.fall){
+      p.ph+=dt*6;
+      if(p.fall===1){
+        p.vy+=900*dt;p.y+=p.vy*dt;
+        if(p.y>=H*.04+p.h*.1){splash(p.x,H*.04,p.w);p.vy*=.35;p.fall=p.sp==='udang'?2:0;}
+      }else{
+        p.y+=90*dt;
+        if(p.y>=floor-p.h*.35){p.y=floor-p.h*.35;p.fall=0;p.vy=0;}
+      }
+      return;
+    }
+    var f=null,bd=1e9;
+    if(p.sp!=='udang'||true){
+      food.forEach(function(o){var d=Math.hypot(o.x-p.x,o.y-p.y);
+        var ok=p.sp==='udang'?o.y>floor-60:true;
+        if(ok&&d<bd){bd=d;f=o;}});
+    }
+    var tx=p.tx,ty=p.ty,sp=speed(p);
+    if(f){tx=f.x;ty=p.sp==='udang'?floor-p.h*.35:f.y;sp*=1.6;
+      if(bd<p.w*.4){food.splice(food.indexOf(f),1);p.pause=.6;}}
+    else if(p.t<=0){pickTarget(p);if(p.sp!=='molly'&&Math.random()<.5)p.pause=rnd(.5,2);}
+    if(p.pause>0){p.pause-=dt;sp=0;}
+    if(p.flee>0){p.flee-=dt;p.pause=0;tx=p.fx;ty=p.fy;sp=speed(p)*(p.sp==='udang'?5:4);if(p.flee<=0)p.t=0;}
+    if(camT&&p===camPet){sp=0;p.flee=0;p.hop=0;}
+    var dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy)||1;
+    var s=d>4?sp:0;
+    if(p.sp==='udang'){
+      if(Math.random()<dt*.15&&!f&&!(camT&&p===camPet)){p.hop=.35;}
+      if(p.hop>0){p.hop-=dt;s=-130;}
+    }
+    p.vx+=((dx/d)*s-p.vx)*Math.min(1,dt*3);
+    p.vy+=((dy/d)*s-p.vy)*Math.min(1,dt*3);
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.sp==='udang')p.y=floor-p.h*.35+Math.sin(p.ph)*1.2;
+    if(Math.abs(p.vx)>4)p.dir=Math.sign(p.vx)*(p.hop>0?-1:1);
+    p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
+    p.y=Math.max(p.h/2,Math.min(floor,p.y));
+  });
+  food.forEach(function(o){o.y+=Math.min(o.vy,40)*dt;o.vy+=20*dt;if(o.y>floor+4){o.y=floor+4;o.vy=0;}o.age+=dt;});
+  food=food.filter(function(o){return o.age<25;});
+  if(cur&&cur.fx){
+    cur.fx.forEach(function(s){s.t+=dt;s.d.forEach(function(d){d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=600*dt;});});
+    cur.fx=cur.fx.filter(function(s){return s.t<1;});
+  }
+  if(Math.random()<dt*1.2)bubbles.push({x:rnd(10,W-10),y:floor,r:rnd(1.5,4),s:rnd(20,45),w:rnd(0,6)});
+  bubbles.forEach(function(b){b.y-=b.s*dt;b.w+=dt*2;});
+  bubbles=bubbles.filter(function(b){return b.y>-8;});
+}
+
+function draw(tm){
+  ctx.save();
+  if(camPet&&camK>.002){
+    var px=camPet.x,py=camPet.y,k=camK,z=1+1.6*k;
+    ctx.translate(px+(W/2-px)*k,py+(H*.3-py)*k);ctx.scale(z,z);ctx.translate(-px,-py);
+  }
+  var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1aa0b0');g.addColorStop(1,'#073f52');
+  ctx.fillStyle=g;ctx.fillRect(-W,-H,3*W,3*H);
+  ctx.save();ctx.globalAlpha=.08;ctx.fillStyle='#fff';
+  for(var i=0;i<4;i++){ctx.beginPath();var x0=W*(.1+i*.25)+Math.sin(tm/2000+i)*20;
+    ctx.moveTo(x0,0);ctx.lineTo(x0+60,0);ctx.lineTo(x0+160,floor);ctx.lineTo(x0+70,floor);ctx.fill();}
+  ctx.restore();
+  ctx.fillStyle='#d9c08a';ctx.fillRect(-W,floor,3*W,2*H);
+  ctx.fillStyle='rgba(120,90,50,.35)';
+  for(var k=0;k<40;k++){ctx.fillRect((k*97)%W,floor+((k*31)%(H-floor-4)),3,2);}
+  plants.forEach(function(p){
+    ctx.strokeStyle='#2f9e57';ctx.lineWidth=5;ctx.lineCap='round';
+    for(var j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(p.x+j*7,floor+4);
+      ctx.quadraticCurveTo(p.x+j*7+Math.sin(tm/900+p.p+j)*14,floor-p.h*.5,p.x+j*10+Math.sin(tm/700+p.p)*18,floor-p.h*(1-Math.abs(j)*.2));ctx.stroke();}
+  });
+  bubbles.forEach(function(b){ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(b.x+Math.sin(b.w)*4,b.y,b.r,0,7);ctx.stroke();});
+  food.forEach(function(o){ctx.fillStyle='#e7b55a';ctx.beginPath();ctx.arc(o.x,o.y,3,0,7);ctx.fill();});
+  pets.slice().sort(function(a,b){return a.y-b.y;}).forEach(function(p){
+    if(!p.img.complete||!p.img.naturalWidth)return;
+    ctx.save();ctx.translate(p.x,p.y);
+    var face=p.dir*(p.flipped?-1:1);
+    ctx.scale(face,1);
+    if(p.sp==='udang'){ctx.rotate(Math.sin(p.ph)*.04);}
+    else if(p.sp==='cupang'){ctx.rotate(Math.sin(p.ph*.8)*.06);ctx.transform(1,0,Math.sin(p.ph)*.12,1,0,0);}
+    else{ctx.rotate(Math.max(-.3,Math.min(.3,p.vy/200))*face*(p.flipped?-1:1)*-1*(p.dir));ctx.scale(1+Math.sin(p.ph)*.03,1);}
+    ctx.drawImage(p.img,-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+  });
+  if(cur&&cur.fx)cur.fx.forEach(function(s){
+    var a=1-s.t,rr=s.w*(.25+.9*s.t);
+    ctx.strokeStyle='rgba(255,255,255,'+(a*.8)+')';ctx.lineWidth=2;
+    ctx.beginPath();ctx.ellipse(s.x,s.y,rr,rr*.22,0,0,7);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(s.x,s.y,rr*.6,rr*.13,0,0,7);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,'+(a*.9)+')';
+    s.d.forEach(function(d){if(d.y<s.y+2){ctx.beginPath();ctx.arc(d.x,d.y,2.2,0,7);ctx.fill();}});
+  });
+  if(inTank&&cur&&tm<pvUntil){
+    var pvi=(pending&&pending.img)||defaults[species],pvc=parseFloat(document.getElementById('cm').value),
+        pvw=pvc>0?pvc*W/Math.max(1,cur.l):(+document.getElementById('size').value)*sc,
+        pvh=pvw*(pvi.naturalWidth?pvi.naturalHeight/pvi.naturalWidth:.58),pvx=W/2,pvy=H*.42;
+    if(pvi.complete&&pvi.naturalWidth){
+      ctx.save();ctx.globalAlpha=.85;ctx.translate(pvx,pvy);
+      if(document.getElementById('left').checked)ctx.scale(-1,1);
+      ctx.drawImage(pvi,-pvw/2,-pvh/2,pvw,pvh);ctx.restore();
+    }
+    ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.5;
+    ctx.strokeRect(pvx-pvw/2-4,pvy-pvh/2-4,pvw+8,pvh+8);ctx.setLineDash([]);
+    ctx.fillStyle='#fff';ctx.font='600 13px system-ui,sans-serif';ctx.textAlign='center';
+    ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=4;
+    ctx.fillText((pvw*Math.max(1,cur.l)/W).toFixed(1)+' cm',pvx,pvy-pvh/2-10);
+    ctx.restore();
+  }
+  ctx.restore();
+  var sy=H*.04;
+  ctx.fillStyle='rgba(235,250,255,.16)';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W,0);
+  for(var sx=W;sx>=0;sx-=8)ctx.lineTo(sx,sy+Math.sin(sx/28+tm/600)*1.6);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1.5;ctx.beginPath();
+  for(var wx=0;wx<=W;wx+=8){var wy=sy+Math.sin(wx/28+tm/600)*1.6;if(wx)ctx.lineTo(wx,wy);else ctx.moveTo(wx,wy);}
+  ctx.stroke();
+}
+
+var last=performance.now();
+var tok=0,loopWin=null,pipWin=null;
+function startLoop(){var my=++tok;(loopWin||window).requestAnimationFrame(function(t){last=t;loop(t,my);});}
+function loop(now,my){if(my!==undefined&&my!==tok)return;var dt=Math.min(.05,(now-last)/1000);last=now;if(inTank&&cur){step(dt);cur.food=food;cur.bubbles=bubbles;draw(now);}else if(!inTank){homeTick(dt,now);}(loopWin||window).requestAnimationFrame(function(t){loop(t,my);});}
+startLoop();
+
+var feedOn=false,infoOn=false,feedBtn=document.getElementById('feed'),infoBtn=document.getElementById('info'),fhint=document.getElementById('fhint');
+var $=function(i){return document.getElementById(i);},sheet=$('sheet');
+var facts={udang:'Udang hias aktif di dasar, rajin makan alga dan sisa makanan, dan berganti kulit saat tumbuh.',molly:'Molly melahirkan anak langsung, bukan bertelur, dan suka berenang aktif di tengah air.',cupang:'Cupang bisa menghirup udara langsung lewat organ labirin, dan yang jantan cenderung teritorial.'};
+function today(){return new Date().toISOString().slice(0,10);}
+var lb=$('lb'),lbI=0,lbX=null;
+function showLb(){
+  var l=sheetPet?sheetPet.mem:[];if(!l.length)return;
+  lbI=(lbI+l.length)%l.length;var m=l[lbI];
+  var isV=m.type==='video',iv=$('lbimg'),vv=$('lbvid');
+  vv.pause();
+  if(isV){vv.src=m.url;vv.hidden=false;iv.hidden=true;}
+  else{vv.removeAttribute('src');vv.load();vv.hidden=true;iv.hidden=false;iv.src=m.url;iv.alt=m.cap||'Memory';}
+  $('lbcap').textContent=(m.cap?m.cap+' - ':'')+m.date+'  ('+(lbI+1)+'/'+l.length+')';
+  $('lbp').style.visibility=$('lbn').style.visibility=l.length>1?'visible':'hidden';
+}
+function openLb(i){lbI=i;lb.hidden=false;showLb();}
+function closeLb(){lb.hidden=true;var v=$('lbvid');v.pause();v.removeAttribute('src');v.load();}
+$('lbx').addEventListener('click',closeLb);
+$('lbp').addEventListener('click',function(){lbI--;showLb();});
+$('lbn').addEventListener('click',function(){lbI++;showLb();});
+$('lbstage').addEventListener('pointerdown',function(e){lbX=e.target.tagName==='VIDEO'?null:e.clientX;});
+$('lbstage').addEventListener('pointerup',function(e){
+  if(lbX===null)return;
+  var dx=e.clientX-lbX;lbX=null;
+  if(dx<-50){lbI++;showLb();}else if(dx>50){lbI--;showLb();}
+});
+document.addEventListener('keydown',function(e){
+  if(lb.hidden)return;
+  if(e.key==='Escape')closeLb();
+  else if(e.key==='ArrowRight'){lbI++;showLb();}
+  else if(e.key==='ArrowLeft'){lbI--;showLb();}
+});
+function openSheet(p){
+  sheetPet=p;camPet=p;camT=1;
+  $('sname').textContent=p.name;$('fnama').value=p.name;
+  $('sfact').textContent=p.sp.charAt(0).toUpperCase()+p.sp.slice(1)+': '+facts[p.sp];
+  $('ftgl').value=p.bio.tgl;$('ffood').value=p.bio.food;$('fsifat').value=p.bio.sifat;$('fnote').value=p.bio.note;
+  renderGal();sheet.hidden=false;sheet.scrollTop=0;
+}
+function closeSheet(){sheetPet=null;camT=0;sheet.hidden=true;}
+$('sclose').addEventListener('click',closeSheet);
+$('fnama').addEventListener('input',function(){
+  if(!sheetPet)return;
+  sheetPet.name=this.value||'Tanpa nama';$('sname').textContent=sheetPet.name;renderList();
+});
+['ftgl:tgl','ffood:food','fsifat:sifat','fnote:note'].forEach(function(s){
+  var a=s.split(':');
+  $(a[0]).addEventListener('input',function(){if(sheetPet)sheetPet.bio[a[1]]=this.value;});
+});
+function renderGal(){
+  var g=$('gal');g.innerHTML='';
+  if(!sheetPet)return;
+  if(!sheetPet.mem.length){var e=document.createElement('p');e.style.gridColumn='1/-1';e.style.margin='0';e.textContent='Belum ada memory. Tambahkan foto kenangan.';g.appendChild(e);return;}
+  sheetPet.mem.forEach(function(m){
+    var f=document.createElement('figure'),im=document.createElement('img'),c=document.createElement('figcaption'),b=document.createElement('button');
+    var isV=m.type==='video',mw=document.createElement('div');
+    mw.className='mw'+(isV?' vid':'');
+    if(isV){im=document.createElement('video');im.src=m.url+'#t=0.1';im.muted=true;im.preload='metadata';im.setAttribute('playsinline','');}
+    else{im.src=m.url;im.alt=m.cap||'Memory';}
+    im.style.cursor='pointer';mw.onclick=function(){openLb(sheetPet.mem.indexOf(m));};mw.appendChild(im);
+    c.textContent=(m.cap?m.cap+' - ':'')+m.date;
+    b.type='button';b.textContent='Hapus';
+    b.onclick=function(){sheetPet.mem.splice(sheetPet.mem.indexOf(m),1);renderGal();};
+    f.appendChild(mw);f.appendChild(c);f.appendChild(b);g.appendChild(f);
+  });
+}
+$('mfile').addEventListener('change',function(){
+  if(!sheetPet)return;
+  var cap=$('mcap').value,list=Array.prototype.slice.call(this.files);
+  list.forEach(function(f){sheetPet.mem.push({blob:f,type:(f.type||'').indexOf('video')===0?'video':'image',url:URL.createObjectURL(f),cap:cap,date:today()});});
+  this.value='';$('mcap').value='';renderGal();
+});
+function setMode(m){
+  feedOn=m==='feed'&&!feedOn;infoOn=m==='info'&&!infoOn;
+  feedBtn.setAttribute('aria-pressed',feedOn?'true':'false');feedBtn.textContent='Beri makan: '+(feedOn?'nyala':'mati');
+  infoBtn.setAttribute('aria-pressed',infoOn?'true':'false');infoBtn.textContent='Info: '+(infoOn?'nyala':'mati');
+  fhint.textContent=feedOn?'Ketuk akuarium untuk menabur makanan.':infoOn?'Ketuk peliharaan untuk melihat biodata dan galeri memory.':'Mengetuk peliharaan bikin dia kabur.';
+  if(!infoOn)closeSheet();
+}
+feedBtn.addEventListener('click',function(){setMode('feed');});
+infoBtn.addEventListener('click',function(){setMode('info');});
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(sheetPet){closeSheet();return;}
+  if(infoOn){
+    var hit=null;
+    pets.forEach(function(p){if(Math.abs(p.x-x)<p.w/2+10&&Math.abs(p.y-y)<p.h/2+10)hit=p;});
+    if(hit)openSheet(hit);
+    return;
+  }
+  if(feedOn){
+    for(var i=0;i<5;i++)food.push({x:x+rnd(-14,14),y:rnd(0,14),vy:rnd(5,20),age:0});
+    return;
+  }
+  pets.forEach(function(p){
+    if(Math.abs(p.x-x)<p.w/2+8&&Math.abs(p.y-y)<p.h/2+8){
+      var away=p.x>=x?1:-1;
+      p.fx=Math.max(p.w/2,Math.min(W-p.w/2,p.x+away*rnd(W*.3,W*.55)));
+      p.fy=p.sp==='udang'?floor-p.h*.35:Math.max(p.h/2,Math.min(floor,p.y+rnd(-90,90)));
+      p.flee=rnd(.8,1.4);
+      for(var i=0;i<4;i++)bubbles.push({x:p.x+rnd(-10,10),y:p.y+rnd(-6,6),r:rnd(1.5,3.5),s:rnd(30,60),w:rnd(0,6)});
+    }
+  });
+});
+
+function renderList(){
+  var l=document.getElementById('list');l.innerHTML='';
+  if(!pets.length){l.textContent='Akuarium masih kosong. Pilih jenis, lalu masukkan peliharaan.';return;}
+  pets.forEach(function(p,i){
+    var d=document.createElement('div');d.className='item';
+    var im=document.createElement('img');im.src=p.img.src;im.alt='';
+    var s=document.createElement('span');s.textContent=p.name+' ('+p.sp+')';
+    var b=document.createElement('button');b.textContent='Keluarkan';
+    b.onclick=function(){if(p===sheetPet)closeSheet();pets.splice(pets.indexOf(p),1);renderList();};
+    d.appendChild(im);d.appendChild(s);d.appendChild(b);l.appendChild(d);
+  });
+}
+
+var btns=document.querySelectorAll('.sp button'),file=document.getElementById('file'),add=document.getElementById('add'),size=document.getElementById('size');
+btns.forEach(function(b){b.onclick=function(){
+  species=b.dataset.s;btns.forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+  size.value=species==='udang'?70:species==='cupang'?110:100;
+};});
+size.value=100;
+add.disabled=false;
+file.addEventListener('change',function(){
+  var f=file.files&&file.files[0];if(!f){pending=null;return;}
+  var rd=new FileReader();
+  rd.onload=function(){var i=new Image();i.onload=function(){pending={blob:f,img:i,name:f.name.replace(/\.[^.]+$/,'').slice(0,16)};};i.src=rd.result;};
+  rd.readAsDataURL(f);
+});
+add.addEventListener('click',function(){
+  var left=document.getElementById('left').checked,w=+size.value;
+  if(pending){addPet(species,pending.img,w,left,pending.name);pets[pets.length-1].blob=pending.blob;pending=null;file.value='';}
+  else addPet(species,defaults[species],w,false,'Bawaan');
+  pvUntil=0;var cmv=parseFloat(document.getElementById('cm').value);
+  if(cmv>0){var np=pets[pets.length-1];np.cm=cmv;np.w=cmv*W/Math.max(1,cur.l);np.h=np.w*np.hb/np.wb;np.y=-np.h;}
+});
+
+function renderTabs(){
+  var t=$('tabs');t.innerHTML='';
+  tanks.forEach(function(k){
+    var b=document.createElement('button');b.type='button';b.className='feedbtn';b.textContent=k.name;
+    b.setAttribute('aria-pressed',k===cur?'true':'false');
+    b.onclick=function(){switchTank(k);};t.appendChild(b);
+  });
+  var a=document.createElement('button');a.type='button';a.className='feedbtn';a.textContent='+ Tank';
+  a.onclick=function(){var k=newTank('Tank '+(tanks.length+1));tanks.push(k);switchTank(k);};
+  t.appendChild(a);
+}
+function switchTank(k){
+  closePip();closeSheet();camK=0;camT=0;camPet=null;
+  $('home').hidden=true;$('tankview').hidden=false;inTank=true;window.scrollTo(0,0);
+  cur=k;pets=k.pets;food=k.food;bubbles=k.bubbles;
+  $('tedit').hidden=true;$('tname').value=k.name;$('tl').value=k.l;$('tt').value=k.t;$('lv').textContent=k.l;$('tv').textContent=k.t;
+  resize();renderBar();renderList();applyFrame();
+}
+$('tname').addEventListener('input',function(){cur.name=this.value||'Tank';renderBar();});
+$('tl').addEventListener('input',function(){cur.l=+this.value;$('lv').textContent=cur.l;resize();});
+$('tt').addEventListener('input',function(){cur.t=+this.value;$('tv').textContent=cur.t;resize();});
+var delArm=false,delT=0;
+$('tdel').addEventListener('click',function(){
+  var b=this;
+  if(!delArm){
+    delArm=true;b.textContent='Yakin? Ketuk lagi';clearTimeout(delT);
+    delT=setTimeout(function(){delArm=false;b.textContent='Hapus tank';},3000);
+    return;
+  }
+  clearTimeout(delT);delArm=false;b.textContent='Hapus tank';
+  tanks.splice(tanks.indexOf(cur),1);goHome();
+});
+function renderBar(){
+  var t=$('tabs');t.innerHTML='';
+  var b=document.createElement('button');b.type='button';b.className='feedbtn';b.textContent='\u2190 Beranda';b.onclick=goHome;t.appendChild(b);
+  var s=document.createElement('strong');s.textContent=cur?cur.name:'';s.style.alignSelf='center';t.appendChild(s);
+  var e=document.createElement('button');e.type='button';e.className='feedbtn';e.textContent='Edit tank';e.style.marginLeft='auto';
+  e.setAttribute('aria-expanded',$('tedit').hidden?'false':'true');
+  e.onclick=function(){var p=$('tedit');p.hidden=!p.hidden;e.setAttribute('aria-expanded',p.hidden?'false':'true');};
+  t.appendChild(e);
+  if(window.documentPictureInPicture){var pb=document.createElement('button');pb.type='button';pb.className='feedbtn';pb.textContent='Melayang di atas aplikasi lain';pb.onclick=function(){openPip(pb);};t.appendChild(pb);}
+}
+var drag=null,holdT=0,dragEnd=0;
+function cardAt(x,y,self){
+  var cs=document.querySelectorAll('#tgrid .hcard');
+  for(var i=0;i<cs.length;i++){
+    if(cs[i]===self)continue;
+    var r=cs[i].getBoundingClientRect();
+    if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return cs[i];
+  }
+  return null;
+}
+function clearTarget(){var t=document.querySelector('#tgrid .target');if(t)t.classList.remove('target');}
+function holdStart(e,w,k){
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  clearTimeout(holdT);
+  var sx=e.clientX,sy=e.clientY,id=e.pointerId;
+  w._sx=sx;w._sy=sy;
+  holdT=setTimeout(function(){
+    drag={w:w,k:k,sx:sx,sy:sy};
+    w.classList.add('lift');
+    try{w.setPointerCapture(id);}catch(x){}
+    if(navigator.vibrate){try{navigator.vibrate(20);}catch(x2){}}
+  },220);
+}
+function holdMove(e){
+  var w=e.currentTarget;
+  if(!drag){
+    if(Math.abs(e.clientX-w._sx)>10||Math.abs(e.clientY-w._sy)>10)clearTimeout(holdT);
+    return;
+  }
+  w.style.transform='translate('+(e.clientX-drag.sx)+'px,'+(e.clientY-drag.sy)+'px) scale(1.05)';
+  clearTarget();
+  var t=cardAt(e.clientX,e.clientY,w);if(t)t.classList.add('target');
+}
+function holdEnd(e){
+  clearTimeout(holdT);
+  if(!drag)return;
+  var w=drag.w,k=drag.k,t=cardAt(e.clientX,e.clientY,w);
+  drag=null;dragEnd=Date.now();clearTarget();
+  if(t&&t._k&&t._k!==k){
+    var a=tanks.indexOf(k),b=tanks.indexOf(t._k);
+    tanks[a]=t._k;tanks[b]=k;
+    renderHome();
+  }else{w.classList.remove('lift');w.style.transform='';}
+}
+function holdCancel(){
+  clearTimeout(holdT);
+  if(drag){drag.w.classList.remove('lift');drag.w.style.transform='';drag=null;clearTarget();}
+}
+function renderHome(){
+  var g=$('tgrid');g.innerHTML='';
+  tanks.forEach(function(k){k.hc=null;});
+  if(!tanks.length){var e=document.createElement('p');e.className='empty';e.textContent='Belum ada tank. Buat tank pertamamu untuk mulai mengisi Memorium.';g.appendChild(e);return;}
+  tanks.forEach(function(k){
+    var w=document.createElement('div'),fr=document.createElement('div'),rim=document.createElement('div'),gl=document.createElement('div'),c=document.createElement('canvas'),st=document.createElement('div'),m=document.createElement('div'),s=document.createElement('strong');
+    w.className='hcard';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label','Buka '+k.name);
+    fr.className='frame';fr.dataset.f=k.frame||'hitam';rim.className='rim';gl.className='glass';st.className='stand';m.className='meta';
+    gl.appendChild(c);rim.appendChild(gl);fr.appendChild(rim);fr.appendChild(st);
+    s.textContent=k.name;m.appendChild(s);
+    m.appendChild(document.createTextNode(k.l+' x '+k.t+' cm, '+k.pets.length+' peliharaan'));
+    w.appendChild(fr);w.appendChild(m);
+    w._k=k;
+    w.onclick=function(){if(Date.now()-dragEnd<400)return;switchTank(k);};
+    w.oncontextmenu=function(e){e.preventDefault();};
+    w.addEventListener('pointerdown',function(e){holdStart(e,w,k);});
+    w.addEventListener('pointermove',holdMove);
+    w.addEventListener('pointerup',holdEnd);
+    w.addEventListener('pointercancel',holdCancel);
+    w.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();switchTank(k);}};
+    g.appendChild(w);
+    k.hc=c;k.hx=c.getContext('2d');
+  });
+}
+function goHome(){
+  closePip();closeSheet();inTank=false;cur=null;pets=[];food=[];bubbles=[];camK=0;camT=0;camPet=null;
+  $('tankview').hidden=true;$('home').hidden=false;renderHome();window.scrollTo(0,0);
+}
+$('newbtn').addEventListener('click',function(){$('cpanel').hidden=false;$('cname').value='';$('cname').focus();});
+$('ccancel').addEventListener('click',function(){$('cpanel').hidden=true;});
+$('cl').addEventListener('input',function(){$('clv').textContent=this.value;});
+$('ct').addEventListener('input',function(){$('ctv').textContent=this.value;});
+$('cok').addEventListener('click',function(){
+  var k=newTank($('cname').value.trim()||'Tank '+(tanks.length+1),+$('cl').value,+$('ct').value);
+  tanks.push(k);$('cpanel').hidden=true;switchTank(k);
+});
+function loadSet(){try{var s=JSON.parse(localStorage.getItem('memorium-set')||'{}');if(s.move===false)homeMove=false;if(s.small===true)homeSmall=true;}catch(e){}}
+function saveSet(){try{localStorage.setItem('memorium-set',JSON.stringify({move:homeMove,small:homeSmall}));}catch(e){}}
+function applySet(){
+  $('tgrid').className='tgrid'+(homeSmall?' small':'');
+  $('smove').checked=homeMove;$('sbig').checked=!homeSmall;$('ssmall').checked=homeSmall;
+}
+$('setbtn').addEventListener('click',function(){var p=$('spanel');p.hidden=!p.hidden;this.setAttribute('aria-expanded',p.hidden?'false':'true');});
+$('smove').addEventListener('change',function(){homeMove=this.checked;saveSet();});
+$('sbig').addEventListener('change',function(){homeSmall=false;applySet();saveSet();});
+$('ssmall').addEventListener('change',function(){homeSmall=true;applySet();saveSet();});
+$('tgrid').addEventListener('touchmove',function(e){if(drag)e.preventDefault();},{passive:false});
+loadSet();applySet();
+var db=null,col=null,uid=null,assetsNS=null,saved={},saving=false,loaded=false;
+function setStat(t){if(t==='Tersimpan'&&!col)t='Tersimpan di perangkat ini';$('sstat').textContent=t;}
+function updateCmHint(){var h=document.getElementById('cmhint');if(h&&cur)h.textContent='Patokan: lebar tank ini '+cur.l+' cm. Kosongkan kolom cm untuk memakai slider.';}
+document.getElementById('size').addEventListener('input',function(){document.getElementById('cm').value='';});
+function splash(x,y,w){
+  var f=cur.fx||(cur.fx=[]),d=[];
+  for(var i=0;i<9;i++)d.push({x:x+rnd(-w/4,w/4),y:y,vx:rnd(-90,90),vy:rnd(-240,-120)});
+  f.push({t:0,x:x,y:y,w:Math.max(30,w),d:d});
+  for(var j=0;j<10;j++)bubbles.push({x:x+rnd(-w/3,w/3),y:y+rnd(5,25),r:rnd(1.5,4),s:rnd(30,70),w:rnd(0,6)});
+}
+function pvTouch(){pvUntil=performance.now()+3000;}
+['size','cm'].forEach(function(id){document.getElementById(id).addEventListener('input',pvTouch);});
+document.getElementById('left').addEventListener('change',pvTouch);
+document.getElementById('file').addEventListener('change',pvTouch);
+Array.prototype.forEach.call(document.querySelectorAll('.sp button'),function(b){b.addEventListener('click',pvTouch);});
+var FRAMES=[['hitam','Hitam','#1b1e21'],['kayu','Kayu','#8a5a2b'],['putih','Putih','#eceeef'],['emas','Emas','#d3a640'],['kaca','Kaca','rgba(160,210,220,.6)']];
+function applyFrame(){
+  if(!cur)return;
+  var fr=document.querySelector('#tankview .frame');if(fr)fr.dataset.f=cur.frame||'hitam';
+  var pk=$('fpick');pk.innerHTML='';
+  FRAMES.forEach(function(f){
+    var b=document.createElement('button'),i=document.createElement('i');
+    b.type='button';b.className='fsw';b.setAttribute('aria-pressed',(cur.frame||'hitam')===f[0]?'true':'false');
+    i.style.background=f[2];b.appendChild(i);b.appendChild(document.createTextNode(f[1]));
+    b.onclick=function(){cur.frame=f[0];applyFrame();};
+    pk.appendChild(b);
+  });
+}
+var PIP_CSS='body{margin:0;background:#0d1b1c;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}.frame{margin:0!important}.rim{padding:6px!important;border-radius:6px 6px 3px 3px}.stand{height:12px!important;margin:0 -4px!important}canvas{display:block}';
+function closePip(){if(pipWin){try{pipWin.close();}catch(e){}}}
+async function openPip(btn){
+  if(!cur||!inTank||pipWin)return;
+  var fr=document.querySelector('#tankview .frame'),ar=Math.max(.35,Math.max(1,cur.t)/Math.max(1,cur.l)),pw;
+  try{pw=await window.documentPictureInPicture.requestWindow({width:380,height:Math.round(340*ar+34)});}
+  catch(e){btn.textContent='Tidak bisa dibuka di sini';setTimeout(function(){btn.textContent='Melayang di atas aplikasi lain';},3000);return;}
+  Array.prototype.forEach.call(document.styleSheets,function(ss){
+    try{var c=Array.prototype.map.call(ss.cssRules,function(r){return r.cssText;}).join('\n'),s=pw.document.createElement('style');s.textContent=c;pw.document.head.appendChild(s);}catch(x){}
+  });
+  var ps=pw.document.createElement('style');ps.textContent=PIP_CSS;pw.document.head.appendChild(ps);
+  pw.document.body.appendChild(fr);
+  pipWin=pw;loopWin=pw;startLoop();resize();
+  pw.addEventListener('resize',resize);
+  pw.addEventListener('pagehide',function(){
+    var tv=document.getElementById('tankview');
+    tv.insertBefore(fr,tv.querySelector('.feedrow'));
+    pipWin=null;loopWin=null;startLoop();
+    if(inTank)resize();
+  });
+}
+function waitClaude(){return new Promise(function(res){var n=0;(function chk(){if(window.claude&&window.claude.use)return res(window.claude);if(++n>40)return res(null);setTimeout(chk,100);})();});}
+function idbOpen(){return new Promise(function(res,rej){var r=indexedDB.open('memorium',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function idbGet(k){return idbOpen().then(function(d){return new Promise(function(res,rej){var q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=function(){res(q.result);};q.onerror=function(){rej(q.error);};});});}
+function idbPut(k,v){return idbOpen().then(function(d){return new Promise(function(res,rej){var t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=function(){res();};t.onerror=function(){rej(t.error);};});});}
+function restorePet(d){
+  var img,b=d.bio||{};
+  if(d.def&&defaults[d.def])img=defaults[d.def];
+  else{img=new Image();img.src=d.blob?URL.createObjectURL(d.blob):'/_blob/'+d.imgId;}
+  return {sp:d.sp,img:img,def:d.def||null,imgId:d.imgId||'',blob:d.blob||null,cm:d.cm||0,wb:d.wb,hb:d.hb,w:d.wb,h:d.hb,name:d.name,flipped:!!d.fl,
+    x:rnd(50,250),y:rnd(60,150),dir:Math.random()<.5?-1:1,vx:0,vy:0,tx:0,ty:0,t:0,ph:rnd(0,6),pause:0,hop:0,
+    bio:{tgl:b.tgl||today(),food:b.food||'',sifat:b.sifat||'',note:b.note||''},
+    mem:(d.mem||[]).map(function(m){return m.blob?{blob:m.blob,type:m.type||'image',url:URL.createObjectURL(m.blob),cap:m.cap||'',date:m.date||''}:{id:m.id,type:m.type||'image',url:'/_blob/'+m.id,cap:m.cap||'',date:m.date||''};})};
+}
+function tankDoc(k,local){
+  var ps=[];
+  k.pets.forEach(function(p){
+    if(!p.def&&!p.imgId&&!(local&&p.blob))return;
+    var mem=[];
+    p.mem.forEach(function(m){var ty=m.type||'image';if(local){if(m.blob)mem.push({blob:m.blob,type:ty,cap:m.cap||'',date:m.date||''});}else if(m.id)mem.push({id:m.id,type:ty,cap:m.cap||'',date:m.date||''});});
+    ps.push({sp:p.sp,def:p.def||'',imgId:p.imgId||'',cm:p.cm||0,wb:Math.round(p.wb),hb:Math.round(p.hb*10)/10,name:p.name||'',fl:p.flipped?1:0,
+      bio:{tgl:p.bio.tgl||'',food:p.bio.food||'',sifat:p.bio.sifat||'',note:p.bio.note||''},mem:mem,blob:(local&&p.blob)?p.blob:null});
+  });
+  return {name:k.name,l:k.l,t:k.t,frame:k.frame||'hitam',pets:ps};
+}
+function buildDocs(local){
+  var d={meta:{order:tanks.map(function(k){return k.id;}),move:homeMove,small:homeSmall}};
+  tanks.forEach(function(k){d['t_'+k.id]=tankDoc(k,local);});
+  return d;
+}
+function pendingUp(){
+  if(!col)return false;
+  var n=false;
+  tanks.forEach(function(k){k.pets.forEach(function(p){
+    if(p.blob&&!p.imgId&&!p.fail)n=true;
+    p.mem.forEach(function(m){if(m.blob&&!m.id&&!m.fail)n=true;});
+  });});
+  return n;
+}
+function uploadPending(){
+  if(!assetsNS||!col)return;
+  tanks.forEach(function(k){k.pets.forEach(function(p){
+    if(p.blob&&!p.imgId&&!p.up&&!p.fail){p.up=true;assetsNS.upload(p.blob).then(function(r){p.imgId=r.id;p.up=false;}).catch(function(){p.up=false;p.fail=true;});}
+    p.mem.forEach(function(m){
+      if(m.blob&&!m.id&&!m.up&&!m.fail){m.up=true;assetsNS.upload(m.blob).then(function(r){m.id=r.id;m.up=false;}).catch(function(){m.up=false;m.fail=true;});}
+    });
+  });});
+}
+async function loadAll(){
+  setStat('Memuat data...');
+  var byId={},meta=null;
+  if(col){
+    var snap=await col.get();
+    snap.docs.forEach(function(d){if(d.id==='meta')meta=d.data();else byId[d.id]=d.data();});
+  }else{
+    var st=(await idbGet('state'))||{};
+    Object.keys(st).forEach(function(id){if(id==='meta')meta=st[id];else byId[id]=st[id];});
+  }
+  var order=((meta&&meta.order)||[]).slice();
+  Object.keys(byId).forEach(function(id){var tid=id.slice(2);if(order.indexOf(tid)<0)order.push(tid);});
+  order.forEach(function(tid){
+    var d=byId['t_'+tid];if(!d)return;
+    var k=newTank(d.name,d.l,d.t);k.id=tid;k.frame=d.frame||'hitam';
+    (d.pets||[]).forEach(function(pd){k.pets.push(restorePet(pd));});
+    tanks.push(k);saved['t_'+tid]=JSON.stringify(tankDoc(k,!col));
+  });
+  if(meta){if(meta.move===false)homeMove=false;if(meta.small===true)homeSmall=true;applySet();}
+  renderHome();
+  setStat('Tersimpan');
+}
+async function autosave(){
+  if(!loaded||saving)return;
+  uploadPending();
+  var docs=buildDocs(!col),todo=[];
+  Object.keys(docs).forEach(function(id){var s=JSON.stringify(docs[id]);if(saved[id]!==s)todo.push([id,s]);});
+  Object.keys(saved).forEach(function(id){if(!(id in docs))todo.push([id,null]);});
+  var waiting=pendingUp();
+  if(!todo.length){setStat(waiting?'Mengunggah foto...':'Tersimpan');return;}
+  saving=true;setStat('Menyimpan...');
+  try{
+    if(!col){
+      await idbPut('state',buildDocs(true));
+      todo.forEach(function(t){if(t[1]===null)delete saved[t[0]];else saved[t[0]]=t[1];});
+    }else for(var i=0;i<todo.length;i++){
+      var did=todo[i][0],s=todo[i][1];
+      if(s===null){await col.doc(did).delete();delete saved[did];}
+      else{await col.doc(did).set(JSON.parse(s));saved[did]=s;}
+    }
+    setStat(waiting?'Mengunggah foto...':'Tersimpan');
+  }catch(e){setStat('Gagal menyimpan, akan dicoba lagi');}
+  saving=false;
+}
+async function initSave(){
+  setStat('Menyiapkan penyimpanan...');
+  var cl=await waitClaude();
+  try{
+    if(cl){
+      var u=await cl.use('user');
+      db=await cl.use('db');
+      assetsNS=await cl.use('assets');
+      if(u&&db){uid=await u.id();col=db.collection('data/users/'+uid);}
+    }
+  }catch(e){col=null;}
+  try{
+    await loadAll();
+    loaded=true;
+    $('home').classList.remove('loading');
+    setInterval(autosave,3000);
+    document.addEventListener('visibilitychange',function(){if(document.hidden)autosave();});
+  }catch(e){$('home').classList.remove('loading');setStat('Penyimpanan gagal dimuat, data tidak akan tersimpan');}
+}
+initSave();
+renderHome();
+})();
+</script>
+</body>
+</html>
