@@ -597,7 +597,7 @@ function renderList(){
     var d=document.createElement('div');d.className='item';
     var im=document.createElement('img');im.src=p.img.src;im.alt='';
     var s=document.createElement('span');s.textContent=p.name+' · '+({udang:'Shrimp',molly:'Molly',cupang:'Betta'}[p.sp]||p.sp);
-    var b=document.createElement('button');b.textContent='Keluarkan';
+    var b=document.createElement('button');b.textContent='Remove pet';
     b.onclick=function(){if(p===sheetPet)closeSheet();pets.splice(pets.indexOf(p),1);renderList();};
     d.appendChild(im);d.appendChild(s);d.appendChild(b);l.appendChild(d);
   });
